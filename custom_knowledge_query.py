@@ -1,13 +1,15 @@
 from langchain import PromptTemplate, LLMChain
 from langchain.document_loaders import TextLoader
-from langchain.embeddings import LlamaCppEmbeddings
+# from langchain.embeddings import LlamaCppEmbeddings
 from langchain.llms import GPT4All
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.callbacks.base import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores.faiss import FAISS
-
-# SCRIPT INFO:
+from langchain.embeddings import OpenAIEmbeddings
+import json
+import openai
+import os
 # 
 # This script allows you to create a vectorstore from a file and query it with a question (hard coded).
 # 
@@ -15,13 +17,15 @@ from langchain.vectorstores.faiss import FAISS
 # 
 # If you want a chat style interface using a similar custom knowledge base, you can use the custom_chatbot.py script provided.
 
+os.environ["OPENAI_API_KEY"] = "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"
 # Setup 
 gpt4all_path = './models/gpt4all-converted.bin' 
-llama_path = './models/ggml-model-q4_0.bin' 
+# llama_path = './models/ggml-model-q4_0.bin' 
 
 callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-loader = TextLoader('./docs/shortened_sotu.txt')
-embeddings = LlamaCppEmbeddings(model_path=llama_path)
+loader = TextLoader('./docs/cancer_pulmon.txt')
+# embeddings = LlamaCppEmbeddings(model_path=llama_path)
+embeddings = OpenAIEmbeddings()
 llm = GPT4All(model=gpt4all_path, callback_manager=callback_manager, verbose=True)
 
 # Split text 
@@ -43,7 +47,7 @@ def create_index(chunks):
 
 
 def similarity_search(query, index):
-    matched_docs = index.similarity_search(query, k=4)
+    matched_docs = index.similarity_search(query) # , k=4
     sources = []
     for doc in matched_docs:
         sources.append(
@@ -74,6 +78,8 @@ index = FAISS.load_local("./full_sotu_index", embeddings)
 # Set your query here manually
 question = "Summarize the comments about NATO and its purpose."
 matched_docs, sources = similarity_search(question, index)
+
+# matched_docs = similarity_search(question, index)
 
 template = """
 Please use the following context to answer questions.
