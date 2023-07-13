@@ -17,7 +17,7 @@ import os
 # 
 # If you want a chat style interface using a similar custom knowledge base, you can use the custom_chatbot.py script provided.
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "OPENAI_API_KEY"
 # Setup 
 gpt4all_path = './models/gpt4all-converted.bin' 
 # llama_path = './models/ggml-model-q4_0.bin' 
